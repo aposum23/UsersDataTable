@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import {useUsersDataStore} from "@/stores/usersStore.ts";
 
+const {addNewRecord} = useUsersDataStore();
 </script>
 
 <template>
@@ -9,6 +11,7 @@
         class="header__button"
         icon="pi pi-plus"
         outlined
+        @click="addNewRecord"
     />
   </div>
 </template>
