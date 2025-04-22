@@ -48,7 +48,18 @@ export const useUsersDataStore = defineStore('usersData', () => {
   }
 
   const getData = () => {
-    usersData.value = JSON.parse(window.localStorage.getItem('users'));
+    const users = JSON.parse(window.localStorage.getItem('users'));
+    usersData.value = users.map(({marker, ...rest}) => {
+      let markerStr = '';
+      for (let index = 0; index <= marker.length; index++) {
+        markerStr += marker[index]?.text || '';
+        markerStr += index < marker.length - 1 ? ';' : ''
+      }
+      return {
+        marker: markerStr,
+        ...rest
+      }
+    })
   }
 
   const addNewRecord = () => {
