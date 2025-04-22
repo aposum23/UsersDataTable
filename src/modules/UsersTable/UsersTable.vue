@@ -8,6 +8,14 @@ const usersStore = useUsersDataStore();
 const {usersData, validateMessage} = toRefs(usersStore);
 const {saveData, getData, deleteRecord} = usersStore;
 
+const dataSaved = ref<boolean>(false);
+
+const saveDataHandler = () => {
+  dataSaved.value = true;
+  saveData();
+  setTimeout(() => dataSaved.value = false, 2000);
+}
+
 onMounted(() => {
   getData();
 })
@@ -28,6 +36,10 @@ const possibleTypeOptions = [
     <Message severity="error" :closable="false" v-show="validateMessage">
       <i class="pi pi-exclamation-circle"/>
       {{validateMessage}}
+    </Message>
+    <Message severity="success" :closable="false" v-show="dataSaved">
+      <i class="pi pi-check-circle"/>
+      Данные сохранены успешно
     </Message>
     <DataTable
       :value="usersData"
@@ -97,7 +109,7 @@ const possibleTypeOptions = [
               label="Сохранить"
               icon="pi pi-save"
               class="table-footer__save-button"
-              @click="saveData"
+              @click="saveDataHandler"
           />
         </div>
       </template>
