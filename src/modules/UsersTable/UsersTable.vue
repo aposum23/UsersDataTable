@@ -1,21 +1,16 @@
 <script setup lang="ts">
 import TheHeader from "./components/TheHeader.vue";
-import {ref} from "vue";
+import {onMounted, ref, toRefs} from "vue";
+import {useUsersDataStore} from "@/stores/usersStore.ts";
 
-const dataTemplate = ref([
-  {
-    marker: 'XXX;XX',
-    type: 'local',
-    login: 'login_example',
-    password: 'password'
-  },
-  {
-    marker: 'XXX;XX',
-    type: 'ldap',
-    login: 'login_example',
-    password: null
-  }
-]);
+const usersStore = useUsersDataStore();
+
+const {usersData, validateMessage} = toRefs(usersStore);
+const {saveData, getData, deleteRecord} = usersStore;
+
+onMounted(() => {
+  getData();
+})
 
 const possibleTypeOptions = [
   {key: 'local', label:'Локальный'},
@@ -30,8 +25,12 @@ const possibleTypeOptions = [
       <i class="pi pi-info-circle"/>
       Для указания нескольких меток для одной пары логин/пароль используйте разделитель ;
     </Message>
+    <Message severity="error" :closable="false" v-show="validateMessage">
+      <i class="pi pi-exclamation-circle"/>
+      {{validateMessage}}
+    </Message>
     <DataTable
-      :value="dataTemplate"
+      :value="usersData"
     >
       <Column
         field="marker"
@@ -66,6 +65,7 @@ const possibleTypeOptions = [
           <InputText
               fluid
               v-model="data.login"
+              :invalid="!data.login"
           />
         </template>
       </Column>
@@ -77,14 +77,18 @@ const possibleTypeOptions = [
           <Password
               fluid
               toggle-mask
-              v-if="data.type !== 'ldap'"
+              v-show="data.type !== 'ldap'"
               v-model="data.password"
+              :invalid="!data.password"
           />
         </template>
       </Column>
       <Column>
-        <template #body>
-          <i class="pi pi-trash"></i>
+        <template #body="{index}">
+          <i
+              class="pi pi-trash"
+              @click="() => deleteRecord(index)"
+          />
         </template>
       </Column>
       <template #footer>
@@ -93,6 +97,7 @@ const possibleTypeOptions = [
               label="Сохранить"
               icon="pi pi-save"
               class="table-footer__save-button"
+              @click="saveData"
           />
         </div>
       </template>
