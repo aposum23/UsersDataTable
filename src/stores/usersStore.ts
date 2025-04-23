@@ -48,18 +48,22 @@ export const useUsersDataStore = defineStore('usersData', () => {
   }
 
   const getData = () => {
-    const users = JSON.parse(window.localStorage.getItem('users'));
-    usersData.value = users.map(({marker, ...rest}) => {
-      let markerStr = '';
-      for (let index = 0; index <= marker.length; index++) {
-        markerStr += marker[index]?.text || '';
-        markerStr += index < marker.length - 1 ? ';' : ''
-      }
-      return {
-        marker: markerStr,
-        ...rest
-      }
-    })
+    try {
+      const users = JSON.parse(window.localStorage.getItem('users'));
+      usersData.value = users.map(({marker, ...rest}) => {
+        let markerStr = '';
+        for (let index = 0; index <= marker.length; index++) {
+          markerStr += marker[index]?.text || '';
+          markerStr += index < marker.length - 1 ? ';' : ''
+        }
+        return {
+          marker: markerStr,
+          ...rest
+        }
+      })
+    } catch (e) {
+      console.error('Could`t get data because it`s empty:', e);
+    }
   }
 
   const addNewRecord = () => {
